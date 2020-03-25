@@ -1,4 +1,4 @@
-# Coding_Practice
+# Practice for coding interview
 
-Coding study with LeetCode, KickStart, Baekjoon, and others.<br>
-Name before underscore is source page of the problem and digit after underscore is problem number.
+This repo contains some solutions of coding problems in LeetCode, Baekjoon online judge, and others.  
+The name of the source file implies the source and number of the problem.  
