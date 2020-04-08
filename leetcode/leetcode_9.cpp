@@ -1,5 +1,4 @@
-// April 7, 2019
-// March 10, 2020 (review)
+// March 10, 2020
 
 class Solution {
 public:
@@ -7,16 +6,29 @@ public:
         if(x < 0)   return false;
         else if(x == 0) return true;
         
+        int org = x, rev = 0;
+        while(x > 0){
+            if(rev > INT_MAX / 10 || (rev == INT_MAX / 10 && x % 10 > 7))
+                return false;
+            rev = rev * 10 + x % 10;
+            x /= 10;
+        }
+        
+        if(org == rev)  return true;
+        else    return false;
+    }
+
+    /* Old solution: April 7, 2019
+    bool isPalindrome(int x) {
+        if(x < 0)   return false;
+        else if(x == 0) return true;
+        
         string org = to_string(x);
         string rev(org);
-        
         reverse(rev.begin(), rev.end());
-        /*int len = org.length();
-        for(int i=0; i<len; i++){
-            rev[i] = org[len - i - 1];
-        }*/
         
         if(!org.compare(rev))   return true;
         else    return false;
     }
+    */
 };

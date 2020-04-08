@@ -1,5 +1,4 @@
-// April 7, 2019
-// March 8, 2020 (review)
+// April 7, 2019 & March 8, 2020
 
 class Solution {
 public:

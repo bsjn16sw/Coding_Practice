@@ -1,5 +1,4 @@
-// April 10, 2019
-// April 2, 2020 (review)
+// April 10, 2019 & April 2, 2020
 
 class Solution {
 public:
@@ -8,16 +7,15 @@ public:
         
         if(len == 0)    return 0;
         else if(len == 1)   return 1;
-        
-        int enter = 1; // position to enter new value
+
+        int next_valid = 1;
         for(int i=1; i<len; i++){
-            if(nums[enter-1] != nums[i]){
-                nums[enter] = nums[i];
-                enter++;
+            if(nums[next_valid-1] != nums[i]){
+                if(i != next_valid) nums[next_valid] = nums[i];
+                next_valid++;
             }
         }
-        
-        nums.resize(enter);
-        return enter;
+
+        return next_valid;
     }
 };

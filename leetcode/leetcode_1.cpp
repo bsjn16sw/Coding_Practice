@@ -1,5 +1,4 @@
-// April 2, 2019
-// March 8, 2020 (review)
+// April 2, 2019 & March 8, 2020
 
 class Solution {
 public:
@@ -31,4 +30,22 @@ public:
         
         return result;
     }
+
+    /* Different solution using unordered_map
+    -> https://leetcode.com/problems/two-sum/discuss/536/My-simple-cpp-code
+
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> numsIndices;
+        
+        for(int i=0; i<nums.size(); i++){
+            auto it = numsIndices.find(target - nums[i]);
+            if(it != numsIndices.end())
+                return vector<int>{it->second, i};
+            else
+                numsIndices.insert(make_pair(nums[i], i));
+        }
+        
+        return vector<int>();
+    }
+    */
 };
