@@ -2,120 +2,108 @@
 #include<vector>
 #include<unordered_map>
 #include<algorithm>
+#define MAX 100
 using namespace std;
 
-vector<vector<int>> r_arith(vector<vector<int> >& v, int R, int C)
+int arr[MAX][MAX] = {0};
+
+int r_arith(int r_num, int c_num)
 {
-    vector<unordered_map<int, int> > vm(R);
+    int max_c_num = 0;
+    unordered_map<int, int> m;
+    vector<pair<int, int> > v;
 
-    int max_pair = 0;
-    for(int i=0; i<R; i++){
-        for(int j=0; j<C; j++){
-            if(!v[i][j])    continue;
+    for(int i=0; i<r_num; i++){
+        for(int j=0; j<c_num; j++){
+            if(!arr[i][j])  continue;
 
-            auto itr = vm[i].find(v[i][j]);
-            if(itr == vm[i].end()){
-                vm[i].insert(make_pair(v[i][j], 1));
-            }
-            else{
-                itr->second += 1;
-            }
+            auto itr = m.find(arr[i][j]);
+            if(itr == m.end())  m.emplace(arr[i][j], 1);
+            else    itr->second++;
         }
-        if(max_pair < vm[i].size()) max_pair = vm[i].size();
-    }
 
-    vector<vector<int> > v2(R, vector<int>(min(max_pair*2, 100)));
-    vector<pair<int, int> > v_sort;
-    for(int i=0; i<R; i++){
-        for(auto j=vm[i].begin(); j!=vm[i].end(); j++){
-            v_sort.emplace_back(j->second, j->first);
-        }
-        sort(v_sort.begin(), v_sort.end());
+        for(auto itr=m.begin(); itr!=m.end(); itr++)
+            v.emplace_back(itr->second, itr->first);
+        sort(v.begin(), v.end());
 
         int idx = 0;
-        for(int j=0; j<v_sort.size(); j++){
-            if(idx > 100)   break;
-            v2[i][idx++] = v_sort[j].second;
-            v2[i][idx++] = v_sort[j].first;
+        for(int j=0; j<v.size(); j++){
+            if(idx >= MAX)  break;
+            arr[i][idx++] = v[j].second;
+            arr[i][idx++] = v[j].first;
         }
 
-        v_sort.clear();
+        for(int j=idx; j<MAX; j++)  arr[i][j] = 0;
+        if(idx > max_c_num) max_c_num = idx;
+
+        m.clear();
+        v.clear();
     }
 
-    return v2;
+    return max_c_num;
 }
 
-vector<vector<int>> c_arith(vector<vector<int> >& v, int R, int C)
+int c_arith(int r_num, int c_num)
 {
-    vector<unordered_map<int, int> > vm(C);
+    int max_r_num = 0;
+    unordered_map<int, int> m;
+    vector<pair<int, int> > v;
 
-    int max_pair = 0;
-    for(int j=0; j<C; j++){
-        for(int i=0; i<R; i++){
-            if(!v[i][j])    continue;
+    for(int j=0; j<c_num; j++){
+        for(int i=0; i<r_num; i++){
+            if(!arr[i][j])  continue;
 
-            auto itr = vm[j].find(v[i][j]);
-            if(itr == vm[j].end()){
-                vm[j].insert(make_pair(v[i][j], 1));
-            }
-            else{
-                itr->second += 1;
-            }
+            auto itr = m.find(arr[i][j]);
+            if(itr == m.end())  m.emplace(arr[i][j], 1);
+            else    itr->second++;
         }
-        if(max_pair < vm[j].size()) max_pair = vm[j].size();
-    }
 
-    vector<vector<int> > v2(min(max_pair*2, 100), vector<int>(C));
-    vector<pair<int, int> > v_sort;
-    for(int i=0; i<C; i++){
-        for(auto j=vm[i].begin(); j!=vm[i].end(); j++){
-            v_sort.emplace_back(j->second, j->first);
-        }
-        sort(v_sort.begin(), v_sort.end());
+        for(auto itr=m.begin(); itr!=m.end(); itr++)
+            v.emplace_back(itr->second, itr->first);
+        sort(v.begin(), v.end());
 
         int idx = 0;
-        for(int j=0; j<v_sort.size(); j++){
-            if(idx > 100)   break;
-            v2[idx++][i] = v_sort[j].second;
-            v2[idx++][i] = v_sort[j].first;
+        for(int i=0; i<v.size(); i++){
+            if(idx >= MAX)  break;
+            arr[idx++][j] = v[i].second;
+            arr[idx++][j] = v[i].first;
         }
 
-        v_sort.clear();
+        for(int i=idx; i<MAX; i++)  arr[i][j] = 0;
+        if(idx > max_r_num) max_r_num = idx;
+
+        m.clear();
+        v.clear();
     }
 
-    return v2;
+    return max_r_num;
 }
-
 
 int main()
 {
     int r, c, k;
     cin >> r >> c >> k;
 
-    vector<vector<int>> v(3, vector<int>(3));
     for(int i=0; i<3; i++){
         for(int j=0; j<3; j++){
-            cin >> v[i][j];
+            cin >> arr[i][j];
         }
     }
 
-    int R = 3, C = 3, time = 0;
-    vector<vector<int>> v2;
+    int r_num = 3, c_num = 3, result = 0;
+    while(arr[r-1][c-1] != k){
+        if(result > 100){
+            result = -1;
+            break;
+        }
 
-    while(true){
-        if(time > 100)  break;
-        if(v[r-1][c-1] == k)    break;
-
-        if(R >= C)  v2 = r_arith(v, R, C);
-        else    v2 = c_arith(v, R, C);
-
-        v2.swap(v);
-        v2.clear();
-        R = v.size();
-        C = v[0].size();
-        time++;
+        if(r_num >= c_num)
+            c_num = r_arith(r_num, c_num);
+        else
+            r_num = c_arith(r_num, c_num);
+        
+        result++;
     }
 
-    if(time > 100)  cout << "-1";
-    else    cout << time;
+    cout << result;
 }
