@@ -179,13 +179,15 @@ for(int i=6; i>=0; i--)
 
 ## [1753. 최단경로](https://www.acmicpc.net/problem/1753)
 다익스트라 알고리즘을 이용해 한 노드에서 모든 노드로의 최단거리를 구한다. 단 `V*V`의 벡터를 잡고 sparse하게 에지 정보를 기록할 경우 메모리 초과가 난다. 따라서 에지의 개수만큼만 저장해 처리한다.  
-메인함수에서 `V`, `E`, `K`를 받고 `E`개의 에지 정보를 `vector<vector<pair<int, int>> > edge_weight(V)`에 저장한다. `edge_weight[i]`는 노드 `i`에서 출발하는 모든 에지 정보가 담겨있는 벡터이다. `emplace_back()`을 이용해 시간을 단축하였다. `dijkstra()`를 호출해 노드 `K-1`로부터 모든 노드로의 최단거리를 구하도록 하였다.  
+메인함수에서 `V`, `E`, `K`를 받고 `E`개의 에지 정보를 `vector<vector<pair<int, int>> > edge(V)`에 저장한다. `edge_weight[i]`는 노드 `i`에서 출발하는 모든 에지 정보가 담겨있는 벡터이다. `dijkstra()`를 호출해 노드 `K-1`로부터 모든 노드로의 최단거리를 구하도록 하였다.  
+추가) 문제에서 서로 다른 두 노드 사이에 여러 개의 간선이 있을 수 있다고 하여 `vector<unordered_map<int, int> > edge(V)`에 가장 작은 거리를 갖는 간선만 중복되지 않게 저장하였더니, 시간과 메모리 모두 오히려 증가하였다. 상황에 따라 잘 판단해야 할 듯하다.  
 
-`void dijkstra(int V, int K, vector<vector<pair<int, int>> >& edge_weight)`  
-`path_weight`는 `V` 크기의 벡터로, 노드 `K`로부터 각 인덱스번째 노드로의 최단거리를 기록한다. 처음에는 모두 INF로 잡고 자기 자신인 `K`까지의 최단거리는 0이므로 이렇게 초기화한다. 그리고 priority queue를 min heap으로 이용해 "아직 방문하지 않은 노드"이면서 "현재까지의 최단거리가 (다른 노드에 비해) 짧은 노드"를 계속해서 얻을 수 있도록 하였다. priority queue `pq`에는 pair가 들어가며, 인덱스가 pair.second인 노드의 (현재까지의) 최단거리를 pair.first가 되도록 push 하였다. 인덱스가 first, 최단거리가 second가 아닌 이유는 최단거리에 따라 정렬되어야 하기 때문이다. `pq`에 `(0, K)`의 pair를 넣는 것으로 시작한다. 다음 내용은 `pq`가 비어있을 때까지 반복한다.  
-1) `pq.top()`의 first와 second를 각각 `pw`, `idx`로 받아온 후 pop한다.  
-2) 만약 `pw`가 현재의 `path_weight[idx]`와 다르다면 이미 `path_weight[idx]`가 `pw`에서 더 작은 값으로 갱신된 것이므로 더 확인할 필요가 없다. continue한다.  
-3) 인덱스가 `idx`인 노드와 인접한 모든 노드에 대하여 최단거리를 갱신할 수 있는지 확인한다. `idx` 노드부터 `idx`와 인접한 어떤 노드까지의 길이에 `pw`를 더한 값이 현재의 `path_weight`값보다 작다면 `path_weight`를 갱신한다. 그리고 `pq`의 pair first, second의 의미에 따라 push한다.  
+
+`void dijkstra(int V, int S, vector<vector<pair<int, int>> >& edge)`  
+`dist`는 `V` 크기의 벡터로, 노드 `S`로부터 각 인덱스번째 노드로의 최단거리를 기록한다. 처음에는 모두 INF로 잡고 `dist[S]`만 0으로 초기화한다. 그리고 방문한 노드를 기록하는 unordered_set `visited`와 priority queue를 min heap으로 이용해 "아직 방문하지 않은 노드"이면서 "현재까지의 최단거리가 (다른 노드에 비해) 짧은 노드"를 계속해서 얻을 수 있도록 하였다. priority queue `pq`에는 pair가 들어가며, 인덱스가 pair.second인 노드의 (현재까지의) 최단거리를 pair.first가 되도록 push 하였다. 인덱스가 first, 최단거리가 second가 아닌 이유는 최단거리에 따라 정렬되어야 하기 때문이다. `pq`에 `(0, S)`의 pair를 넣는 것으로 시작한다. 다음 내용은 `pq`가 비어있을 때까지 반복한다.  
+1) `pq.top()`의 first와 second를 각각 `d`, `u`로 받아온 후 pop한다.  
+2) 만약 `visited`에 `u`가 있다면 즉 `u`를 이미 방문한 적이 있다면 더 확인할 필요가 없다. continue한다.  
+3) `visited`에 `u`를 넣고, 인덱스가 `u`인 노드와 인접한 모든 노드에 대하여 최단거리를 갱신할 수 있는지 확인한다. `u` 노드부터 `u`와 인접한 어떤 노드까지의 길이에 `d`를 더한 값이 현재의 `dist`값보다 작다면 `dist`를 갱신한다. 그리고 `pq`의 pair first, second의 의미에 따라 push한다.  
 위의 반복이 끝나면 최단거리를 모두 구한 것이므로 각 노드까지의 최단거리를 출력한다.  
 
 <a name="3190"/>
